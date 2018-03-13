@@ -1,0 +1,34 @@
+<div class="counter-bar" *ngIf="allFiles">Total Files {{allFiles.length}}</div>
+<table class="table table-hover">
+  <thead>
+    <tr class="panel-heading">
+      <th>File Name</th>
+      <th>Size</th>
+      <th>Duplicate Count</th>
+      <th><a href="#" style="visibility:hidden"><i class="fa fa-eye" aria-hidden="true"></i></a></th>
+    </tr>
+
+  </thead>
+  <tbody>
+    <tr class="hoveraction" *ngFor="let file of allFiles">
+      <td>{{file.fileName}}</td>
+      <td>{{file.created | date:'dd/MM/yyyy'}}</td>
+      <td>{{file.files.length}}</td>
+      <td><a href="#" class="hoveractionbtn"><i class="fa fa-eye" aria-hidden="true" (click)="onView(file.files)"></i></a></td>
+    </tr>
+    <tr *ngIf="allFiles && allFiles.length == 0">
+      <td colspan="9" style="text-align: center">No records to show</td>
+    </tr>
+  </tbody>
+
+</table>
+
+
+
+  <ng-template #template>
+    <div class="modal-body text-center">
+      <p>Do you want to delete the trade ?</p>
+      <button type="button" class="btn btn-default" (click)="deleteTrade()" >Yes</button>
+      <button type="button" class="btn btn-primary" (click)="modalRef.hide()" >No</button>
+    </div>
+  </ng-template>

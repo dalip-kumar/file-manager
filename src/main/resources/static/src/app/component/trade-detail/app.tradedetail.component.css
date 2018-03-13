@@ -1,0 +1,36 @@
+.text-bold {
+  font-weight: bold;
+}
+.detail-icon{
+  float: right;
+  cursor: pointer;
+}
+.panel-body .row {
+  margin: 5px;
+  padding: 5px;
+}
+.trade-footer  {
+  margin-top: 40px !important;
+  float: right;
+}
+.panel-body div{
+  text-align: left;
+}
+.has-error{
+  background-color: red;
+}
+select, input {
+  width: 100%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.previewPanel{
+  max-height: 400px;
+ width: 400px 
+}
+.largemodal{
+  width:90%;
+}

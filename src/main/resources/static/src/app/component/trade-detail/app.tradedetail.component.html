@@ -1,0 +1,56 @@
+
+<div class="modal fade" bsModal #tradeDataModal="bs-modal" [config]="{backdrop: 'static'}"
+     tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg largemodal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">File Detail</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="cancel()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          
+        <div class="panel ">
+
+                <div class="row">
+                    <div class="previewPanel">
+
+                            <img *ngIf="base64Image" [src]="base64Image" />
+
+                    </div>
+                </div>
+                <table class="table table-hover">
+                        <thead>
+                          <tr class="panel-heading">
+                            <th>File</th>
+                            <th>Size</th>
+                            <th>Created</th>
+                            <th>Modified</th>
+                            <th>Location</th>
+                            <th><a href="#" style="visibility:hidden"><i class="fa fa-eye" aria-hidden="true"></i></a></th>
+                            <th><a href="#" style="visibility:hidden"><i class="fa fa-trash" aria-hidden="true"></i></a></th>
+                          </tr>
+                      
+                        </thead>
+                        <tbody>
+                          <tr class="hoveraction" *ngFor="let file of files">
+
+                            <td>{{file.fileName}}</td>
+                            <td>{{file.size}}</td>
+                            <td>{{file.created | date:'dd/MM/yyyy'}}</td>
+                            <td>{{file.modified | date:'dd/MM/yyyy'}}</td>
+                            <td>{{file.fullPath}}</td>
+                            <td><a href="#" class="hoveractionbtn"><i class="fa fa-eye" aria-hidden="true" (click)="onView(file.fullPath)"></i></a></td>
+                            <td><a href="#" class="hoveractionbtn"><i class="fa fa-trash" aria-hidden="true" (click)="onDelete(file.fullPath)"></i></a></td>
+                          </tr>
+                        </tbody>
+                      
+                      </table>
+                </div>
+
+
+</div>
+    </div>
+  </div>
+</div>
