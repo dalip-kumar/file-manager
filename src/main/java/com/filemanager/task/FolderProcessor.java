@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.RecursiveTask;
 
 import org.springframework.amqp.AmqpException;
@@ -18,20 +19,20 @@ public class FolderProcessor extends RecursiveTask<List<String>>
    //This attribute will store the full path of the folder this task is going to process.
    private String      path = null;
    //This attribute will store the name of the extension of the files this task is going to look for.
-   private String      extension = null;
+   private Set<String>      extension = null;
  
-   
-   
    private RabbitTemplate jmsTemplate;
    
    public FolderProcessor(){
 	   
    }
    //Implement the constructor of the class to initialize its attributes
-   public FolderProcessor(String path, RabbitTemplate jmsTemplate)
+   public FolderProcessor(String path, RabbitTemplate jmsTemplate, Set<String> extension)
    {
       this.path = path;
       this.jmsTemplate = jmsTemplate;
+      this.extension = extension;
+      
    }
  
    //Implement the compute() method. As you parameterized the RecursiveTask class with the List<String> type,
@@ -55,7 +56,7 @@ public class FolderProcessor extends RecursiveTask<List<String>>
         	 File currentFile = content[i];
             if (currentFile.isDirectory())
             {
-               FolderProcessor task = new FolderProcessor(currentFile.getAbsolutePath(), this.jmsTemplate);
+               FolderProcessor task = new FolderProcessor(currentFile.getAbsolutePath(), this.jmsTemplate, this.extension);
                task.fork();
                tasks.add(task);
             }
@@ -68,11 +69,19 @@ public class FolderProcessor extends RecursiveTask<List<String>>
                   list.add(content[i].getAbsolutePath());
                }*/
             	try {
-					jmsTemplate.convertAndSend("files.queue", new FileDetail(currentFile));
+            		if(this.extension.isEmpty()){
+            			jmsTemplate.convertAndSend("files.queue", new FileDetail(currentFile));
+            			System.out.printf("%s: %d tasks ran.\n", currentFile.getAbsolutePath(), tasks.size());
+            		}
+            		else if(checkFile(currentFile)){
+            			jmsTemplate.convertAndSend("files.queue", new FileDetail(currentFile));
+            			System.out.printf("%s: %d tasks ran.\n", currentFile.getAbsolutePath(), tasks.size());
+            		}
+					
 				} catch (AmqpException | IOException e) {
 					e.printStackTrace();
 				}
-            	System.out.printf("%s: %d tasks ran.\n", currentFile.getAbsolutePath(), tasks.size());
+            	
             }
          }
       }
@@ -100,8 +109,25 @@ public class FolderProcessor extends RecursiveTask<List<String>>
    }
  
    //This method compares if the name of a file passed as a parameter ends with the extension you are looking for.
-   private boolean checkFile(String name)
+   private boolean checkFile(File file)
    {
-      return name.endsWith(extension);
+	   try{
+	   String fileExtn = getFileExtension(file.getName());
+	   if( fileExtn != null){
+		   return extension.contains(fileExtn);  
+	   	}
+	   }catch(Exception ex){
+		   ex.printStackTrace();
+	   }
+	   return false;
+	   
+   }
+   
+   private String getFileExtension(String file){
+	   int index = file.lastIndexOf(".");
+	   if(index > -1){
+		   return file.substring(index).toUpperCase();
+	   }
+	   return null;
    }
 }

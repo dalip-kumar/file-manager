@@ -29,7 +29,8 @@ select, input {
 
 .previewPanel{
   max-height: 400px;
- width: 400px 
+  width: 400px; 
+  
 }
 .largemodal{
   width:90%;

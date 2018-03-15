@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,28 +25,33 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.filemanager.dto.FileDetail;
 import com.filemanager.dto.FileGroup;
+import com.filemanager.task.Startup;
 
 @RestController
 public class FileController {
 
+	private Logger log = LoggerFactory.getLogger(FileController.class);
+	
 	@Autowired
 	MongoTemplate mongoTemplate;
 	
 	@RequestMapping(value="/files/duplicate", method = RequestMethod.GET)
 	public Collection<FileGroup> getDuplicateFiles(){
-		
+		log.info("Start FileController.getDuplicateFiles");
 		List<FileDetail> result = new LinkedList<>();
 		Query query = new Query();
 		query.addCriteria(Criteria.where("length").gt(1));
 		  
 		Collection<FileGroup> files = mongoTemplate.find(query, FileGroup.class);
-		files.parallelStream().forEach(elm -> result.addAll(elm.getFiles()));
+		files.stream().forEach(elm -> result.addAll(elm.getFiles()));
+		log.info("End FileController.getDuplicateFiles");
 		return files;
 	}
 	
 	@ResponseBody
 	@RequestMapping(value="/files/removefile", method = RequestMethod.GET)
 	public ResponseEntity<String> deleteFile(@RequestParam("file") String file){
+		log.info("Start FileController.deleteFile");
 		File file1 = new File(file);
 		String result= "";
 		if(file1.exists()){
@@ -55,13 +62,14 @@ public class FileController {
 		}
 		ResponseEntity<String> responseEntity = new ResponseEntity<>(result,
                 HttpStatus.OK);
-		
+		log.info("End FileController.deleteFile");
 		return responseEntity;
 	}
 	
 	@ResponseBody
 	@RequestMapping(value="/files/loadfile", method = RequestMethod.GET)
 	public ResponseEntity<String> loadFile(@RequestParam("file") String fileName){
+		log.info("Start FileController.loadFile");
 		String base64Image = "";
 		File file = new File(fileName);
 		try (FileInputStream imageInFile = new FileInputStream(file)) {
@@ -78,6 +86,7 @@ public class FileController {
 		}
 		 ResponseEntity<String> responseEntity = new ResponseEntity<>(base64Image,
                  HttpStatus.OK);
+		 log.info("End FileController.loadFile");
 		return responseEntity;
 	}
 	
